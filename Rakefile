@@ -1,6 +1,6 @@
 require "rubygems"
 require "bundler/setup"
-require "stringex"
+require "stringex" unless ENV['RACK_ENV'] == 'production'
 
 ## -- Rsync Deploy config -- ##
 # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
@@ -377,4 +377,13 @@ desc "list tasks"
 task :list do
   puts "Tasks: #{(Rake::Task.tasks - [Rake::Task[:list]]).join(', ')}"
   puts "(type rake -T for more detail)\n\n"
+end
+
+task :dyno_ping do
+  require "net/http"
+
+  if ENV['PING_URL']
+    uri = URI(ENV['PING_URL'])
+    Net::HTTP.get_response(uri)
+  end
 end
